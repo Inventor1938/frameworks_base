@@ -13,6 +13,8 @@
 -->
 <resources>
 
-  <java-symbol type="bool" name="config_useSystemClockforRotationSensor" />
+    <java-symbol type="bool" name="config_useSystemClockforRotationSensor" />
+
+    <java-symbol type="bool" name="config_useDefaultBatchingForAccel" />
 
 </resources>
