@@ -4862,9 +4862,7 @@ public class PackageManagerService extends IPackageManager.Stub
         if ((flags & PackageManager.MATCH_ANY_USER) != 0) {
             // require the permission to be held; the calling uid and given user id referring
             // to the same user is not sufficient
-            mPermissionManager.enforceCrossUserPermission(
-                    Binder.getCallingUid(), userId, false, false,
-                    !isRecentsAccessingChildProfiles(Binder.getCallingUid(), userId),
+            enforceCrossUserPermission(Binder.getCallingUid(), userId, false, false, true,
                     "MATCH_ANY_USER flag requires INTERACT_ACROSS_USERS permission at "
                     + Debug.getCallers(5));
         } else if ((flags & PackageManager.MATCH_UNINSTALLED_PACKAGES) != 0 && isCallerSystemUser
@@ -5447,18 +5445,191 @@ public class PackageManagerService extends IPackageManager.Stub
         }
     }
 
-    private boolean addDynamicPermission(PermissionInfo info, final boolean async) {
-        return mPermissionManager.addDynamicPermission(
-                info, async, getCallingUid(), new PermissionCallback() {
-                    @Override
-                    public void onPermissionChanged() {
-                        if (!async) {
-                            mSettings.writeLPr();
-                        } else {
-                            scheduleWriteSettingsLocked();
-                        }
-                    }
-                });
+    /**
+     * Checks if the request is from the system or an app that has INTERACT_ACROSS_USERS
+     * or INTERACT_ACROSS_USERS_FULL permissions, if the userid is not for the caller.
+     * @param checkShell whether to prevent shell from access if there's a debugging restriction
+     * @param message the message to log on security exception
+     */
+    void enforceCrossUserPermission(int callingUid, int userId, boolean requireFullPermission,
+            boolean checkShell, String message) {
+        enforceCrossUserPermission(
+              callingUid,
+              userId,
+              requireFullPermission,
+              checkShell,
+              false,
+              message);
+    }
+
+    private void enforceCrossUserPermission(int callingUid, int userId,
+            boolean requireFullPermission, boolean checkShell,
+            boolean requirePermissionWhenSameUser, String message) {
+        if (userId < 0) {
+            throw new IllegalArgumentException("Invalid userId " + userId);
+        }
+        if (checkShell) {
+            enforceShellRestriction(UserManager.DISALLOW_DEBUGGING_FEATURES, callingUid, userId);
+        }
+        if (!requirePermissionWhenSameUser && userId == UserHandle.getUserId(callingUid)) return;
+        if (callingUid != Process.SYSTEM_UID && callingUid != 0) {
+            if (requireFullPermission) {
+                mContext.enforceCallingOrSelfPermission(
+                        android.Manifest.permission.INTERACT_ACROSS_USERS_FULL, message);
+            } else {
+                try {
+                    mContext.enforceCallingOrSelfPermission(
+                            android.Manifest.permission.INTERACT_ACROSS_USERS_FULL, message);
+                } catch (SecurityException se) {
+                    mContext.enforceCallingOrSelfPermission(
+                            android.Manifest.permission.INTERACT_ACROSS_USERS, message);
+                }
+            }
+        }
+    }
+
+    void enforceShellRestriction(String restriction, int callingUid, int userHandle) {
+        if (callingUid == Process.SHELL_UID) {
+            if (userHandle >= 0
+                    && sUserManager.hasUserRestriction(restriction, userHandle)) {
+                throw new SecurityException("Shell does not have permission to access user "
+                        + userHandle);
+            } else if (userHandle < 0) {
+                Slog.e(TAG, "Unable to check shell permission for user " + userHandle + "\n\t"
+                        + Debug.getCallers(3));
+            }
+        }
+    }
+
+    private BasePermission findPermissionTreeLP(String permName) {
+        for(BasePermission bp : mSettings.mPermissionTrees.values()) {
+            if (permName.startsWith(bp.name) &&
+                    permName.length() > bp.name.length() &&
+                    permName.charAt(bp.name.length()) == '.') {
+                return bp;
+            }
+        }
+        return null;
+    }
+
+    private BasePermission checkPermissionTreeLP(String permName) {
+        if (permName != null) {
+            BasePermission bp = findPermissionTreeLP(permName);
+            if (bp != null) {
+                if (bp.uid == UserHandle.getAppId(Binder.getCallingUid())) {
+                    return bp;
+                }
+                throw new SecurityException("Calling uid "
+                        + Binder.getCallingUid()
+                        + " is not allowed to add to permission tree "
+                        + bp.name + " owned by uid " + bp.uid);
+            }
+        }
+        throw new SecurityException("No permission tree found for " + permName);
+    }
+
+    static boolean compareStrings(CharSequence s1, CharSequence s2) {
+        if (s1 == null) {
+            return s2 == null;
+        }
+        if (s2 == null) {
+            return false;
+        }
+        if (s1.getClass() != s2.getClass()) {
+            return false;
+        }
+        return s1.equals(s2);
+    }
+
+    static boolean comparePermissionInfos(PermissionInfo pi1, PermissionInfo pi2) {
+        if (pi1.icon != pi2.icon) return false;
+        if (pi1.logo != pi2.logo) return false;
+        if (pi1.protectionLevel != pi2.protectionLevel) return false;
+        if (!compareStrings(pi1.name, pi2.name)) return false;
+        if (!compareStrings(pi1.nonLocalizedLabel, pi2.nonLocalizedLabel)) return false;
+        // We'll take care of setting this one.
+        if (!compareStrings(pi1.packageName, pi2.packageName)) return false;
+        // These are not currently stored in settings.
+        //if (!compareStrings(pi1.group, pi2.group)) return false;
+        //if (!compareStrings(pi1.nonLocalizedDescription, pi2.nonLocalizedDescription)) return false;
+        //if (pi1.labelRes != pi2.labelRes) return false;
+        //if (pi1.descriptionRes != pi2.descriptionRes) return false;
+        return true;
+    }
+
+    int permissionInfoFootprint(PermissionInfo info) {
+        int size = info.name.length();
+        if (info.nonLocalizedLabel != null) size += info.nonLocalizedLabel.length();
+        if (info.nonLocalizedDescription != null) size += info.nonLocalizedDescription.length();
+        return size;
+    }
+
+    int calculateCurrentPermissionFootprintLocked(BasePermission tree) {
+        int size = 0;
+        for (BasePermission perm : mSettings.mPermissions.values()) {
+            if (perm.uid == tree.uid) {
+                size += perm.name.length() + permissionInfoFootprint(perm.perm.info);
+            }
+        }
+        return size;
+    }
+
+    void enforcePermissionCapLocked(PermissionInfo info, BasePermission tree) {
+        // We calculate the max size of permissions defined by this uid and throw
+        // if that plus the size of 'info' would exceed our stated maximum.
+        if (tree.uid != Process.SYSTEM_UID) {
+            final int curTreeSize = calculateCurrentPermissionFootprintLocked(tree);
+            if (curTreeSize + permissionInfoFootprint(info) > MAX_PERMISSION_TREE_FOOTPRINT) {
+                throw new SecurityException("Permission tree size cap exceeded");
+            }
+        }
+    }
+
+    boolean addPermissionLocked(PermissionInfo info, boolean async) {
+        if (getInstantAppPackageName(Binder.getCallingUid()) != null) {
+            throw new SecurityException("Instant apps can't add permissions");
+        }
+        if (info.labelRes == 0 && info.nonLocalizedLabel == null) {
+            throw new SecurityException("Label must be specified in permission");
+        }
+        BasePermission tree = checkPermissionTreeLP(info.name);
+        BasePermission bp = mSettings.mPermissions.get(info.name);
+        boolean added = bp == null;
+        boolean changed = true;
+        int fixedLevel = PermissionInfo.fixProtectionLevel(info.protectionLevel);
+        if (added) {
+            enforcePermissionCapLocked(info, tree);
+            bp = new BasePermission(info.name, tree.sourcePackage,
+                    BasePermission.TYPE_DYNAMIC);
+        } else if (bp.type != BasePermission.TYPE_DYNAMIC) {
+            throw new SecurityException(
+                    "Not allowed to modify non-dynamic permission "
+                    + info.name);
+        } else {
+            if (bp.protectionLevel == fixedLevel
+                    && bp.perm.owner.equals(tree.perm.owner)
+                    && bp.uid == tree.uid
+                    && comparePermissionInfos(bp.perm.info, info)) {
+                changed = false;
+            }
+        }
+        bp.protectionLevel = fixedLevel;
+        info = new PermissionInfo(info);
+        info.protectionLevel = fixedLevel;
+        bp.perm = new PackageParser.Permission(tree.perm.owner, info);
+        bp.perm.info.packageName = tree.perm.info.packageName;
+        bp.uid = tree.uid;
+        if (added) {
+            mSettings.mPermissions.put(info.name, bp);
+        }
+        if (changed) {
+            if (!async) {
+                mSettings.writeLPr();
+            } else {
+                scheduleWriteSettingsLocked();
+            }
+        }
+        return added;
     }
 
     @Override
@@ -7965,7 +8136,7 @@ public class PackageManagerService extends IPackageManager.Stub
         if (!sUserManager.exists(userId)) return ParceledListSlice.emptyList();
         flags = updateFlagsForPackage(flags, userId, null);
         final boolean listUninstalled = (flags & MATCH_KNOWN_PACKAGES) != 0;
-        mPermissionManager.enforceCrossUserPermission(callingUid, userId,
+        enforceCrossUserPermission(callingUid, userId,
                 false /* requireFullPermission */, false /* checkShell */,
                 "get installed packages");
 
@@ -8090,7 +8261,7 @@ public class PackageManagerService extends IPackageManager.Stub
         flags = updateFlagsForApplication(flags, userId, null);
         final boolean listUninstalled = (flags & MATCH_KNOWN_PACKAGES) != 0;
 
-        mPermissionManager.enforceCrossUserPermission(
+        enforceCrossUserPermission(
             callingUid,
             userId,
             false /* requireFullPermission */,
