@@ -99,8 +99,6 @@ public class ScreenDecorations extends SystemUI implements Tunable {
     private int mRotation;
     private DisplayCutoutView mCutoutTop;
     private DisplayCutoutView mCutoutBottom;
-    private boolean mPendingRotationChange;
-    private Handler mHandler;
 
     @Override
     public void start() {
@@ -171,12 +169,12 @@ public class ScreenDecorations extends SystemUI implements Tunable {
         mOverlay = LayoutInflater.from(mContext)
                 .inflate(R.layout.rounded_corners, null);
         mCutoutTop = new DisplayCutoutView(mContext, true,
-                this::updateWindowVisibilities, this);
+                this::updateWindowVisibilities);
         ((ViewGroup)mOverlay).addView(mCutoutTop);
         mBottomOverlay = LayoutInflater.from(mContext)
                 .inflate(R.layout.rounded_corners, null);
         mCutoutBottom = new DisplayCutoutView(mContext, false,
-                this::updateWindowVisibilities, this);
+                this::updateWindowVisibilities);
         ((ViewGroup)mBottomOverlay).addView(mCutoutBottom);
 
         mOverlay.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
@@ -593,10 +591,10 @@ public class ScreenDecorations extends SystemUI implements Tunable {
         }
 
         private void update() {
-            if (!isAttachedToWindow() || mDecorations.mPendingRotationChange) {
+            mStart = isStart();
+            if (!isAttachedToWindow()) {
                 return;
             }
-            mStart = isStart();
             requestLayout();
             getDisplay().getDisplayInfo(mInfo);
             mBounds.setEmpty();
