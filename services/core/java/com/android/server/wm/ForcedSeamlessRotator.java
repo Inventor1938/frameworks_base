@@ -21,12 +21,8 @@ import static android.view.Surface.ROTATION_90;
 
 import android.graphics.Matrix;
 import android.view.DisplayInfo;
-import android.view.Surface.Rotation;
 
 import com.android.server.wm.utils.CoordinateTransforms;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 /**
  * Helper class for forced seamless rotation.
@@ -40,13 +36,8 @@ public class ForcedSeamlessRotator {
 
     private final Matrix mTransform = new Matrix();
     private final float[] mFloat9 = new float[9];
-    private final int mOldRotation;
-    private final int mNewRotation;
 
     public ForcedSeamlessRotator(int oldRotation, int newRotation, DisplayInfo info) {
-        mOldRotation = oldRotation;
-        mNewRotation = newRotation;
-
         final boolean flipped = info.rotation == ROTATION_90 || info.rotation == ROTATION_270;
         final int h = flipped ? info.logicalWidth : info.logicalHeight;
         final int w = flipped ? info.logicalHeight : info.logicalWidth;
@@ -66,16 +57,6 @@ public class ForcedSeamlessRotator {
     }
 
     /**
-     * Returns the rotation of the display before it started rotating.
-     *
-     * @return the old rotation of the display
-     */
-    @Rotation
-    public int getOldRotation() {
-        return mOldRotation;
-    }
-
-    /**
      * Removes the transform to the window token's surface that undoes the effect of the global
      * display rotation.
      *
@@ -86,25 +67,11 @@ public class ForcedSeamlessRotator {
     public void finish(WindowToken token, WindowState win) {
         mTransform.reset();
         token.getPendingTransaction().setMatrix(token.mSurfaceControl, mTransform, mFloat9);
-        if (win.mWinAnimator.mSurfaceController != null) {
-            token.getPendingTransaction().deferTransactionUntil(token.mSurfaceControl,
-                    win.mWinAnimator.mSurfaceController.mSurfaceControl.getHandle(),
-                    win.getFrameNumber());
-            win.getPendingTransaction().deferTransactionUntil(win.mSurfaceControl,
-                    win.mWinAnimator.mSurfaceController.mSurfaceControl.getHandle(),
-                    win.getFrameNumber());
-        }
-    }
-
-    public void dump(PrintWriter pw) {
-        pw.print("{old="); pw.print(mOldRotation); pw.print(", new="); pw.print(mNewRotation);
-        pw.print("}");
-    }
-
-    @Override
-    public String toString() {
-        StringWriter sw = new StringWriter();
-        dump(new PrintWriter(sw));
-        return "ForcedSeamlessRotator" + sw.toString();
+        token.getPendingTransaction().deferTransactionUntil(token.mSurfaceControl,
+                win.mWinAnimator.mSurfaceController.mSurfaceControl.getHandle(),
+                win.getFrameNumber());
+        win.getPendingTransaction().deferTransactionUntil(win.mSurfaceControl,
+                win.mWinAnimator.mSurfaceController.mSurfaceControl.getHandle(),
+                win.getFrameNumber());
     }
 }

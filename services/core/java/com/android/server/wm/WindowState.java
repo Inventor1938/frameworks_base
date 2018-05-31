@@ -290,7 +290,6 @@ class WindowState extends WindowContainer<WindowState> implements WindowManagerP
      */
     final boolean mForceSeamlesslyRotate;
     ForcedSeamlessRotator mPendingForcedSeamlessRotate;
-    long mFinishForcedSeamlessRotateFrameNumber;
 
     private RemoteCallbackList<IWindowFocusObserver> mFocusCallbacks;
 
@@ -682,10 +681,6 @@ class WindowState extends WindowContainer<WindowState> implements WindowManagerP
 
     void forceSeamlesslyRotateIfAllowed(int oldRotation, int rotation) {
         if (mForceSeamlesslyRotate) {
-            if (mPendingForcedSeamlessRotate != null) {
-                oldRotation = mPendingForcedSeamlessRotate.getOldRotation();
-            }
-
             mPendingForcedSeamlessRotate = new ForcedSeamlessRotator(
                     oldRotation, rotation, getDisplayInfo());
             mPendingForcedSeamlessRotate.unrotate(this.mToken);
@@ -4902,7 +4897,9 @@ class WindowState extends WindowContainer<WindowState> implements WindowManagerP
 
     @Override
     void seamlesslyRotate(Transaction t, int oldRotation, int newRotation) {
-        if (!isVisibleNow() || mIsWallpaper) {
+        // Invisible windows, the wallpaper, and force seamlessly rotated windows do not participate
+        // in the regular seamless rotation animation.
+        if (!isVisibleNow() || mIsWallpaper || mForceSeamlesslyRotate) {
             return;
         }
         final Matrix transform = mTmpMatrix;

@@ -1894,7 +1894,6 @@ public class WindowManagerService extends IWindowManager.Stub
 
             if (win.mPendingForcedSeamlessRotate != null && !mWaitingForConfig) {
                 win.mPendingForcedSeamlessRotate.finish(win.mToken, win);
-                win.mFinishForcedSeamlessRotateFrameNumber = win.getFrameNumber();
                 win.mPendingForcedSeamlessRotate = null;
             }
 
