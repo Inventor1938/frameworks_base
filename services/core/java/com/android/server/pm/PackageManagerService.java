@@ -8135,8 +8135,8 @@ public class PackageManagerService extends IPackageManager.Stub
         }
         if (!sUserManager.exists(userId)) return ParceledListSlice.emptyList();
         flags = updateFlagsForPackage(flags, userId, null);
-        final boolean listUninstalled = (flags & MATCH_KNOWN_PACKAGES) != 0;
-        enforceCrossUserPermission(callingUid, userId,
+        final boolean listUninstalled = (flags & MATCH_UNINSTALLED_PACKAGES) != 0;
+        enforceCrossUserPermission(Binder.getCallingUid(), userId,
                 false /* requireFullPermission */, false /* checkShell */,
                 "get installed packages");
 
@@ -8254,12 +8254,16 @@ public class PackageManagerService extends IPackageManager.Stub
     @Override
     public ParceledListSlice<ApplicationInfo> getInstalledApplications(int flags, int userId) {
         final int callingUid = Binder.getCallingUid();
-        if (getInstantAppPackageName(callingUid) != null) {
-            return ParceledListSlice.emptyList();
-        }
         if (!sUserManager.exists(userId)) return ParceledListSlice.emptyList();
         flags = updateFlagsForApplication(flags, userId, null);
         final boolean listUninstalled = (flags & MATCH_KNOWN_PACKAGES) != 0;
+
+        enforceCrossUserPermission(
+            callingUid,
+            userId,
+            false /* requireFullPermission */,
+            false /* checkShell */,
+            "get installed application info");
 
         enforceCrossUserPermission(
             callingUid,
