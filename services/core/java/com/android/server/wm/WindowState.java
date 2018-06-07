@@ -4902,9 +4902,7 @@ class WindowState extends WindowContainer<WindowState> implements WindowManagerP
 
     @Override
     void seamlesslyRotate(Transaction t, int oldRotation, int newRotation) {
-        // Invisible windows, the wallpaper, and force seamlessly rotated windows do not participate
-        // in the regular seamless rotation animation.
-        if (!isVisibleNow() || mIsWallpaper || mForceSeamlesslyRotate) {
+        if (!isVisibleNow() || mIsWallpaper) {
             return;
         }
         final Matrix transform = mTmpMatrix;
