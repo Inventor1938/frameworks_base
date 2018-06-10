@@ -121,7 +121,7 @@
     <string name="roamingText11" msgid="4154476854426920970">"রোমিং ব্যানার চালু আছে"</string>
     <string name="roamingText12" msgid="1189071119992726320">"রোমিং ব্যানার বন্ধ আছে"</string>
     <string name="roamingTextSearching" msgid="8360141885972279963">"পরিষেবা সার্চ করা হচ্ছে"</string>
-    <string name="wfcRegErrorTitle" msgid="3855061241207182194">"ওয়াই-ফাই কলিং সেট-আপ করা যায়নি"</string>
+    <string name="wfcRegErrorTitle" msgid="2301376280632110664">"ওয়াই-ফাই কলিং"</string>
   <string-array name="wfcOperatorErrorAlertMessages">
     <item msgid="3910386316304772394">"ওয়াই-ফাই এর মাধ্যমে কল করতে ও মেসেজ পাঠাতে, প্রথমে আপনার পরিষেবা প্রদানকারীকে এই পরিষেবার সেট-আপ করতে বলুন। তারপর আবার সেটিংস থেকে ওয়াই-ফাই কলিং চালু করুন। (ত্রুটি কোড: <xliff:g id="CODE">%1$s</xliff:g>)"</item>
   </string-array>
