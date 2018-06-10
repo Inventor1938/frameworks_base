@@ -72,12 +72,13 @@
     <string name="global_action_screenshot" msgid="8329831278085426283">"स्क्रीनशॉट"</string>
     <string name="screenshot_saving_ticker" msgid="7403652894056693515">"स्क्रीनशॉट सेव्ह करत आहे…"</string>
     <string name="screenshot_saving_title" msgid="8242282144535555697">"स्क्रीनशॉट सेव्ह करत आहे…"</string>
-    <string name="screenshot_saved_title" msgid="5637073968117370753">"स्क्रीनशॉट सेव्ह केला"</string>
-    <string name="screenshot_saved_text" msgid="7574667448002050363">"तुमचा स्क्रीनशॉट पाहण्यासाठी टॅप करा"</string>
-    <string name="screenshot_failed_title" msgid="7612509838919089748">"स्क्रीनशॉट सेव्ह करू शकलो नाही"</string>
-    <string name="screenshot_failed_to_save_unknown_text" msgid="3637758096565605541">"स्क्रीनशॉट पुन्हा घेण्याचा प्रयत्न करा"</string>
-    <string name="screenshot_failed_to_save_text" msgid="3041612585107107310">"मर्यादित स्टोरेज जागेमुळे स्क्रीनशॉट सेव्ह करू शकत नाही"</string>
-    <string name="screenshot_failed_to_capture_text" msgid="173674476457581486">"अ‍ॅप किंवा आपल्या संस्थेद्वारे स्क्रीनशॉट घेण्याची अनुमती नाही"</string>
+    <string name="screenshot_saving_text" msgid="2419718443411738818">"स्क्रीनशॉट सेव्ह केला जात आहे."</string>
+    <string name="screenshot_saved_title" msgid="6461865960961414961">"स्क्रीनशॉट कॅप्चर केला."</string>
+    <string name="screenshot_saved_text" msgid="2685605830386712477">"आपला स्क्रीनशॉट पाहण्यासाठी टॅप करा."</string>
+    <string name="screenshot_failed_title" msgid="705781116746922771">"स्क्रीनशॉट कॅप्चर करू शकलो नाही."</string>
+    <string name="screenshot_failed_to_save_unknown_text" msgid="7887826345701753830">"स्क्रीनशॉट सेव्ह करताना समस्या आली."</string>
+    <string name="screenshot_failed_to_save_text" msgid="2592658083866306296">"मर्यादित स्टोरेज जागेमुळे स्क्रीनशॉट सेव्ह करू शकत नाही."</string>
+    <string name="screenshot_failed_to_capture_text" msgid="7602391003979898374">"अॅप किंवा आपल्या संस्थेद्वारे स्क्रीनशॉट घेण्यास अनुमती नाही."</string>
     <string name="usb_preference_title" msgid="6551050377388882787">"USB फाईल स्थानांतरण पर्याय"</string>
     <string name="use_mtp_button_title" msgid="4333504413563023626">"मीडिया प्लेअर म्हणून माउंट करा (MTP)"</string>
     <string name="use_ptp_button_title" msgid="7517127540301625751">"कॅमेरा म्हणून माउंट करा (PTP)"</string>
