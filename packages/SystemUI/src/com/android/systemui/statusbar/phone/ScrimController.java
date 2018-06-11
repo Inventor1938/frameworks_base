@@ -889,14 +889,9 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, OnCo
     }
 
     public void setHasBackdrop(boolean hasBackdrop) {
-        for (ScrimState state : ScrimState.values()) {
-            state.setHasBackdrop(hasBackdrop);
-        }
-    }
-
-    public void setLaunchingAffordanceWithPreview(boolean launchingAffordanceWithPreview) {
-        for (ScrimState state : ScrimState.values()) {
-            state.setLaunchingAffordanceWithPreview(launchingAffordanceWithPreview);
+        ScrimState[] states = ScrimState.values();
+        for (int i = 0; i < states.length; i++) {
+            states[i].setHasBackdrop(hasBackdrop);
         }
     }
 
