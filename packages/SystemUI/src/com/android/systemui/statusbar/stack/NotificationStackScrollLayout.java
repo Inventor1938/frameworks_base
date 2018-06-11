@@ -428,9 +428,6 @@ public class NotificationStackScrollLayout extends ViewGroup
     private int mHeadsUpInset;
     private HeadsUpAppearanceController mHeadsUpAppearanceController;
     private NotificationIconAreaController mIconAreaController;
-    private float mVerticalPanelTranslation;
-
-    private Interpolator mDarkXInterpolator = Interpolators.FAST_OUT_SLOW_IN;
 
     public NotificationStackScrollLayout(Context context) {
         this(context, null);
@@ -4046,7 +4043,7 @@ public class NotificationStackScrollLayout extends ViewGroup
         mLinearDarkAmount = linearDarkAmount;
         mInterpolatedDarkAmount = interpolatedDarkAmount;
         boolean wasFullyDark = mAmbientState.isFullyDark();
-        mAmbientState.setDarkAmount(interpolatedDarkAmount);
+        mAmbientState.setDarkAmount(darkAmount);
         boolean nowFullyDark = mAmbientState.isFullyDark();
         if (nowFullyDark != wasFullyDark) {
             updateContentHeight();
