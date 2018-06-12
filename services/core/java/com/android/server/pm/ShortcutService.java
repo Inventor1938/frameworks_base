@@ -1592,6 +1592,24 @@ public class ShortcutService extends IShortcutService.Stub {
         }
     }
 
+    private void verifyShortcutInfoPackage(String callerPackage, ShortcutInfo si) {
+        if (si == null) {
+            return;
+        }
+        if (!Objects.equals(callerPackage, si.getPackage())) {
+            android.util.EventLog.writeEvent(0x534e4554, "109824443", -1, "");
+            throw new SecurityException("Shortcut package name mismatch");
+        }
+    }
+
+    private void verifyShortcutInfoPackages(
+            String callerPackage, List<ShortcutInfo> list) {
+        final int size = list.size();
+        for (int i = 0; i < size; i++) {
+            verifyShortcutInfoPackage(callerPackage, list.get(i));
+        }
+    }
+
     // Overridden in unit tests to execute r synchronously.
     void injectPostToHandler(Runnable r) {
         mHandler.post(r);
