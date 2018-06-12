@@ -178,6 +178,7 @@ public enum ScrimState {
     boolean mWallpaperSupportsAmbientMode;
     int mIndex;
     boolean mHasBackdrop;
+    boolean mLaunchingAffordanceWithPreview;
 
     ScrimState(int index) {
         mIndex = index;
