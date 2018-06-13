@@ -428,6 +428,7 @@ public class NotificationStackScrollLayout extends ViewGroup
     private int mHeadsUpInset;
     private HeadsUpAppearanceController mHeadsUpAppearanceController;
     private NotificationIconAreaController mIconAreaController;
+    private float mVerticalPanelTranslation;
 
     public NotificationStackScrollLayout(Context context) {
         this(context, null);
@@ -4009,7 +4010,7 @@ public class NotificationStackScrollLayout extends ViewGroup
     }
 
     private void updatePanelTranslation() {
-        setTranslationX(mVerticalPanelTranslation + mAntiBurnInOffsetX * mInterpolatedDarkAmount);
+        setTranslationX(mVerticalPanelTranslation + mAntiBurnInOffsetX * mDarkAmount);
     }
 
     public void setVerticalPanelTranslation(float verticalPanelTranslation) {
