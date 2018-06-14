@@ -3518,25 +3518,6 @@
     <!-- Whether or not swipe up gesture's opt-in setting is available on this device -->
     <bool name="config_swipe_up_gesture_setting_available">false</bool>
 
-    <!-- List of names that represent dual SoftAp interfaces. -->
-    <string-array translatable="false" name="config_wifi_dual_sap_interfaces">
-    </string-array>
-
-    <!-- Applications which are disabled unless matching a particular sku -->
-    <string-array name="config_disableApksUnlessMatchedSku_apk_list" translatable="false" />
-    <string-array name="config_disableApkUnlessMatchedSku_skus_list" translatable="false" />
-
     <!-- Whether or not we should show the option to show battery percentage -->
     <bool name="config_battery_percentage_setting_available">true</bool>
-
-    <!-- Model of potentially misprovisioned devices. If none is specified in an overlay, an
-         empty string is passed in. -->
-    <string name="config_misprovisionedDeviceModel" translatable="false"></string>
-
-    <!-- Brand value for attestation of misprovisioned device. -->
-    <string name="config_misprovisionedBrandValue" translatable="false"></string>
-  
-    <!-- Component name for default assistant on this device -->
-    <string name="config_defaultAssistantComponentName"></string>
-
-  </resources>
+</resources>
