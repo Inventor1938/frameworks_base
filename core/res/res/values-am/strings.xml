@@ -1790,8 +1790,6 @@
     <string name="work_mode_off_title" msgid="1118691887588435530">"የስራ መገለጫ ይብራ?"</string>
     <string name="work_mode_off_message" msgid="5130856710614337649">"የእርስዎ የስራ መተግበሪያዎች፣ ማሳወቂያዎች፣ ውሂብ እና ሌሎች የስራ መገለጫ ባህሪያት ይበራሉ"</string>
     <string name="work_mode_turn_on" msgid="2062544985670564875">"አብራ"</string>
-    <string name="deprecated_target_sdk_message" msgid="1449696506742572767">"ይህ መተግበሪያ ለቆየ የAndroid ስሪት ነው የተገነባው፣ እና በአግባቡ ላይሰራ ይችላል። ዝማኔዎች ካሉ ለመመልከት ይሞክሩ፣ ወይም ደግሞ ገንቢውን ያነጋግሩ።"</string>
-    <string name="deprecated_target_sdk_app_store" msgid="5032340500368495077">"ዝማኔ ካለ አረጋግጥ"</string>
     <string name="new_sms_notification_title" msgid="8442817549127555977">"አዲስ መልዕክቶች አለዎት"</string>
     <string name="new_sms_notification_content" msgid="7002938807812083463">"ለመመልከት የኤስኤምኤስ መተግበሪያ ይክፈቱ"</string>
     <string name="user_encrypted_title" msgid="9054897468831672082">"አንዳንድ ተግባሮች የተገደቡ ሊሆኑ ይችላሉ"</string>
