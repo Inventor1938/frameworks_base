@@ -331,7 +331,7 @@ public class StatusBarWindowView extends FrameLayout {
             expandingBelowNotch = true;
         }
         if (expandingBelowNotch) {
-            return mNotificationPanel.dispatchTouchEvent(ev);
+            return mStatusBarView.dispatchTouchEvent(ev);
         }
 
         return super.dispatchTouchEvent(ev);
