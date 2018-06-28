@@ -3416,13 +3416,6 @@
   <java-symbol type="integer" name="config_defaultHapticFeedbackIntensity" />
   <java-symbol type="integer" name="config_defaultNotificationVibrationIntensity" />
 
-  <java-symbol type="bool" name="config_maskMainBuiltInDisplayCutout" />
-
   <java-symbol type="array" name="config_disableApksUnlessMatchedSku_apk_list" />
   <java-symbol type="array" name="config_disableApkUnlessMatchedSku_skus_list" />
-
-  <java-symbol type="string" name="config_misprovisionedDeviceModel" />
-  <java-symbol type="string" name="config_misprovisionedBrandValue" />
- 
-  <java-symbol type="string" name="config_defaultAssistantComponentName" />
 </resources>
