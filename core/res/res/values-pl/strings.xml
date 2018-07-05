@@ -358,12 +358,8 @@
     <string name="permdesc_enableCarMode" msgid="4853187425751419467">"Pozwala aplikacji na włączanie trybu samochodowego."</string>
     <string name="permlab_killBackgroundProcesses" msgid="3914026687420177202">"zamykanie innych aplikacji"</string>
     <string name="permdesc_killBackgroundProcesses" msgid="4593353235959733119">"Pozwala aplikacji na kończenie procesów innych aplikacji działających w tle. Może to spowodować przerwanie działania innych aplikacji."</string>
-    <string name="permlab_systemAlertWindow" msgid="7238805243128138690">"Ta aplikacja może wyświetlać się nad innymi aplikacjami"</string>
-    <string name="permdesc_systemAlertWindow" msgid="2393776099672266188">"Ta aplikacja może pojawić się nad innymi aplikacjami lub częściami ekranu. Może to przeszkadzać w jej zwykłym używaniu i zmieniać sposób wyświetlania innych aplikacji."</string>
-    <string name="permlab_runInBackground" msgid="7365290743781858803">"działanie w tle"</string>
-    <string name="permdesc_runInBackground" msgid="7370142232209999824">"Ta aplikacja może działać w tle. Bateria może się szybciej rozładowywać."</string>
-    <string name="permlab_useDataInBackground" msgid="8694951340794341809">"transmisja danych w tle"</string>
-    <string name="permdesc_useDataInBackground" msgid="6049514223791806027">"Ta aplikacja może przesyłać i odbierać dane w tle. Użycie danych może się zwiększyć."</string>
+    <string name="permlab_systemAlertWindow" msgid="3543347980839518613">"wyświetlanie nad innymi aplikacjami"</string>
+    <string name="permdesc_systemAlertWindow" msgid="8584678381972820118">"Zezwala aplikacji na wyświetlanie elementów interfejsu nad innymi aplikacjami lub elementami ich interfejsu. Może to powodować zakłócenia w korzystaniu z interfejsu innej aplikacji lub inne działanie aplikacji, niż wynikałoby to z widocznego interfejsu danej aplikacji."</string>
     <string name="permlab_persistentActivity" msgid="8841113627955563938">"sprawianie, że aplikacja jest cały czas uruchomiona"</string>
     <string name="permdesc_persistentActivity" product="tablet" msgid="8525189272329086137">"Pozwala aplikacji na trwałe zapisywanie swoich fragmentów w pamięci. Może to zmniejszyć ilość pamięci dostępnej dla innych aplikacji i spowolnić działanie tabletu."</string>
     <string name="permdesc_persistentActivity" product="tv" msgid="5086862529499103587">"Pozwala aplikacji zapewnić nieusuwalność swoich fragmentów z pamięci. Może to ograniczyć ilość pamięci dostępną dla innych aplikacji i spowalniać działanie telewizora."</string>
