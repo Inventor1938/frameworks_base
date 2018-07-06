@@ -290,6 +290,7 @@ class WindowState extends WindowContainer<WindowState> implements WindowManagerP
      */
     final boolean mForceSeamlesslyRotate;
     ForcedSeamlessRotator mPendingForcedSeamlessRotate;
+    long mFinishForcedSeamlessRotateFrameNumber;
 
     private RemoteCallbackList<IWindowFocusObserver> mFocusCallbacks;
 
