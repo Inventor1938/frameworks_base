@@ -70,7 +70,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.List;
 import java.util.ArrayList;
 
 import java.util.zip.ZipFile;
@@ -105,7 +104,6 @@ public final class PinnerService extends SystemService {
     private final Context mContext;
     private final ActivityManagerInternal mAmInternal;
     private final IActivityManager mAm;
-    private final UserManager mUserManager;
 
     /** The list of the statically pinned files. */
     @GuardedBy("this")
@@ -167,15 +165,11 @@ public final class PinnerService extends SystemService {
         mAmInternal = LocalServices.getService(ActivityManagerInternal.class);
         mAm = ActivityManager.getService();
 
-        mUserManager = mContext.getSystemService(UserManager.class);
-
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_PACKAGE_REPLACED);
         filter.addDataScheme("package");
         mContext.registerReceiver(mBroadcastReceiver, filter);
-
         registerUidListener();
-        registerUserSetupCompleteListener();
     }
 
     @Override
@@ -199,16 +193,12 @@ public final class PinnerService extends SystemService {
      */
     @Override
     public void onSwitchUser(int userHandle) {
-        if (!mUserManager.isManagedProfile(userHandle)) {
-            sendPinAppsMessage(userHandle);
-        }
+        sendPinAppsMessage(userHandle);
     }
 
     @Override
     public void onUnlockUser(int userHandle) {
-        if (!mUserManager.isManagedProfile(userHandle)) {
-            sendPinAppsMessage(userHandle);
-        }
+        sendPinAppsMessage(userHandle);
     }
 
     /**
@@ -249,26 +239,6 @@ public final class PinnerService extends SystemService {
                 mPinnedFiles.add(pf);
             }
         }
-    }
-
-    /**
-     * Registers a listener to repin the home app when user setup is complete, as the home intent
-     * initially resolves to setup wizard, but once setup is complete, it will resolve to the
-     * regular home app.
-     */
-    private void registerUserSetupCompleteListener() {
-        Uri userSetupCompleteUri = Settings.Secure.getUriFor(
-                Settings.Secure.USER_SETUP_COMPLETE);
-        mContext.getContentResolver().registerContentObserver(userSetupCompleteUri,
-                false, new ContentObserver(null) {
-                    @Override
-                    public void onChange(boolean selfChange, Uri uri) {
-                        if (userSetupCompleteUri.equals(uri)) {
-                            sendPinAppMessage(KEY_HOME, ActivityManager.getCurrentUser(),
-                                    true /* force */);
-                        }
-                    }
-                }, UserHandle.USER_ALL);
     }
 
     private void registerUidListener() {
@@ -331,7 +301,13 @@ public final class PinnerService extends SystemService {
                     app.active = active;
                 }
             }
+            mPendingRepin.remove(uid);
         }
+        pinApp(key, ActivityManager.getCurrentUser(), false /* force */);
+    }
+
+    private void handleUidActive(int uid) {
+        updateActiveState(uid, true /* active */);
     }
 
     private void unpinApp(@AppKey int key) {
@@ -355,75 +331,27 @@ public final class PinnerService extends SystemService {
 
     private ApplicationInfo getCameraInfo(int userHandle) {
         Intent cameraIntent = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
-        ApplicationInfo info = getApplicationInfoForIntent(cameraIntent, userHandle,
-            false /* defaultToSystemApp */);
-
-        // If the STILL_IMAGE_CAMERA intent doesn't resolve, try the _SECURE intent.
-        // We don't use _SECURE first because it will never get set on a device
-        // without File-based Encryption. But if the user has only set the intent
-        // before unlocking their device, we may still be able to identify their
-        // preference using this intent.
-        if (info == null) {
-            cameraIntent = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA_SECURE);
-            info = getApplicationInfoForIntent(cameraIntent, userHandle,
-                false /* defaultToSystemApp */);
-        }
-
-        // If the _SECURE intent doesn't resolve, try the original intent but request
-        // the system app for camera if there was more than one result.
-        if (info == null) {
-            cameraIntent = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
-            info = getApplicationInfoForIntent(cameraIntent, userHandle,
-                true /* defaultToSystemApp */);
-        }
-        return info;
+        return getApplicationInfoForIntent(cameraIntent, userHandle);
     }
 
     private ApplicationInfo getHomeInfo(int userHandle) {
         Intent intent = mAmInternal.getHomeIntent();
-        return getApplicationInfoForIntent(intent, userHandle, false);
+        return getApplicationInfoForIntent(intent, userHandle);
     }
 
-    private ApplicationInfo getApplicationInfoForIntent(Intent intent, int userHandle,
-            boolean defaultToSystemApp) {
+    private ApplicationInfo getApplicationInfoForIntent(Intent intent, int userHandle) {
         if (intent == null) {
             return null;
         }
-
-        ResolveInfo resolveInfo = mContext.getPackageManager().resolveActivityAsUser(intent,
+        ResolveInfo info = mContext.getPackageManager().resolveActivityAsUser(intent,
                 MATCH_FLAGS, userHandle);
-
-        // If this intent can resolve to only one app, choose that one.
-        // Otherwise, if we've requested to default to the system app, return it;
-        // if we have not requested that default, return null if there's more than one option.
-        // If there's more than one system app, return null since we don't know which to pick.
-        if (resolveInfo == null) {
+        if (info == null) {
             return null;
         }
-
-        if (!isResolverActivity(resolveInfo.activityInfo)) {
-            return resolveInfo.activityInfo.applicationInfo;
+        if (isResolverActivity(info.activityInfo)) {
+            return null;
         }
-
-        if (defaultToSystemApp) {
-            List<ResolveInfo> infoList = mContext.getPackageManager()
-                .queryIntentActivitiesAsUser(intent, MATCH_FLAGS, userHandle);
-            ApplicationInfo systemAppInfo = null;
-            for (ResolveInfo info : infoList) {
-                if ((info.activityInfo.applicationInfo.flags
-                      & ApplicationInfo.FLAG_SYSTEM) != 0) {
-                    if (systemAppInfo == null) {
-                        systemAppInfo = info.activityInfo.applicationInfo;
-                    } else {
-                        // If there's more than one system app, return null due to ambiguity.
-                        return null;
-                    }
-                }
-            }
-            return systemAppInfo;
-        }
-
-        return null;
+        return info.activityInfo.applicationInfo;
     }
 
     private void sendPinAppsMessage(int userHandle) {
