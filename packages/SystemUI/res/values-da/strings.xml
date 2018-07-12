@@ -724,11 +724,11 @@
     <string name="adjust_button_width" msgid="6138616087197632947">"Juster knappens bredde"</string>
     <string name="clipboard" msgid="1313879395099896312">"Udklipsholder"</string>
     <string name="accessibility_key" msgid="5701989859305675896">"Tilpasset navigationsknap"</string>
-    <string name="left_keycode" msgid="2010948862498918135">"Venstre tastekode"</string>
-    <string name="right_keycode" msgid="708447961000848163">"Højre tastekode"</string>
-    <string name="left_icon" msgid="3096287125959387541">"Venstre ikon"</string>
-    <string name="right_icon" msgid="3952104823293824311">"Højre ikon"</string>
-    <string name="drag_to_add_tiles" msgid="230586591689084925">"Tilføj felter ved at holde dem nede og trække"</string>
+    <string name="keycode" msgid="7335281375728356499">"Tastekode"</string>
+    <string name="keycode_description" msgid="1403795192716828949">"Tastekodeknapper gør det muligt at føje tastaturtaster til navigationslinjen. Når der trykkes på dem, efterligner de den valgte tastaturtast. Først vælges tasten til knappen, og derefter vælges det billede, der skal vises på knappen."</string>
+    <string name="select_keycode" msgid="7413765103381924584">"Vælg tastaturknap"</string>
+    <string name="preview" msgid="9077832302472282938">"Forhåndsvisning"</string>
+    <string name="drag_to_add_tiles" msgid="7058945779098711293">"Træk for at tilføje felter"</string>
     <string name="drag_to_remove_tiles" msgid="3361212377437088062">"Træk herhen for at fjerne"</string>
     <string name="drag_to_remove_disabled" msgid="2390968976638993382">"Du skal bruge mindst seks felter"</string>
     <string name="qs_edit" msgid="2232596095725105230">"Rediger"</string>
