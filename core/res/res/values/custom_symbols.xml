@@ -15,31 +15,8 @@
      limitations under the License.
 -->
 <resources>
-    <!-- Rotation sensor -->
-    <java-symbol type="bool" name="config_useSystemClockforRotationSensor" />
 
-    <!-- Package Manager -->
-    <java-symbol type="array" name="config_disabledComponents" />
-    <java-symbol type="array" name="config_forceEnabledComponents" />
+    <!-- Whether device ignores the RSSNR signal implementation -->
+    <java-symbol type="bool" name="config_ignoreRssnrSignalLevel" />
 
-    <!-- Whether notify fingerprint client of successful cancelled authentication -->
-    <java-symbol type="bool" name="config_notifyClientOnFingerprintCancelSuccess" />
-
-    <!-- The list of vendor package signatures that should also be considered
-         platform signatures, specifically for use on devices with a vendor partition. -->
-    <java-symbol type="array" name="config_vendorPlatformSignatures" />
-
-    <!-- Advanced power menu -->
-    <java-symbol type="string" name="reboot_to_recovery_title" />
-    <java-symbol type="string" name="reboot_to_recovery_message" />
-    <java-symbol type="string" name="reboot_to_bootloader_title" />
-    <java-symbol type="string" name="reboot_to_bootloader_message" />
-    <java-symbol type="string" name="reboot_title" />
-    <java-symbol type="string" name="reboot_message" />
-
-    <!-- Emergency button in power menu -->
-    <java-symbol type="bool" name="config_showEmergencyButtonInPowerMenu" />
-
-    <!-- Sensor block-per package -->
-    <java-symbol type="array" name="config_blockPackagesSensorDrain" />
 </resources>
