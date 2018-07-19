@@ -628,6 +628,8 @@ public class PackageManagerService extends IPackageManager.Stub
 
     private static final int PROTECTION_MASK_BASE = 0xf;
 
+    private static final int PROTECTION_MASK_BASE = 0xf;
+
     final ServiceThread mHandlerThread;
 
     final PackageHandler mHandler;
@@ -5738,6 +5740,82 @@ public class PackageManagerService extends IPackageManager.Stub
             // Critical, after this call app should never have the permission.
             mSettings.writeRuntimePermissionsForUserLPr(userId, true);
 
+    @Override
+    public void revokeRuntimePermission(String packageName, String name, int userId) {
+        revokeRuntimePermission(packageName, name, userId, mSettings.getPermission(name));
+    }
+
+    private void revokeRuntimePermission(String packageName, String name, int userId,
+            BasePermission bp) {
+        if (!sUserManager.exists(userId)) {
+            Log.e(TAG, "No such user:" + userId);
+            return;
+        }
+
+        mContext.enforceCallingOrSelfPermission(
+                android.Manifest.permission.REVOKE_RUNTIME_PERMISSIONS,
+                "revokeRuntimePermission");
+
+        enforceCrossUserPermission(Binder.getCallingUid(), userId,
+                true /* requireFullPermission */, true /* checkShell */,
+                "revokeRuntimePermission");
+
+        final int appId;
+
+        synchronized (mPackages) {
+            final PackageParser.Package pkg = mPackages.get(packageName);
+            if (pkg == null) {
+                throw new IllegalArgumentException("Unknown package: " + packageName);
+            }
+            if (bp == null) {
+                throw new IllegalArgumentException("Unknown permission: " + name);
+            }
+
+            enforceDeclaredAsUsedAndRuntimeOrDevelopmentPermission(pkg, bp);
+
+            // If a permission review is required for legacy apps we represent
+            // their permissions as always granted runtime ones since we need
+            // to keep the review required permission flag per user while an
+            // install permission's state is shared across all users.
+            if (Build.PERMISSIONS_REVIEW_REQUIRED
+                    && pkg.applicationInfo.targetSdkVersion < Build.VERSION_CODES.M
+                    && bp.isRuntime()) {
+                return;
+            }
+
+            SettingBase sb = (SettingBase) pkg.mExtras;
+            if (sb == null) {
+                throw new IllegalArgumentException("Unknown package: " + packageName);
+            }
+
+            final PermissionsState permissionsState = sb.getPermissionsState();
+
+            final int flags = permissionsState.getPermissionFlags(name, userId);
+            if ((flags & PackageManager.FLAG_PERMISSION_SYSTEM_FIXED) != 0) {
+                throw new SecurityException("Cannot revoke system fixed permission "
+                        + name + " for package " + packageName);
+            }
+
+            if (bp.isDevelopment()) {
+                // Development permissions must be handled specially, since they are not
+                // normal runtime permissions.  For now they apply to all users.
+                if (permissionsState.revokeInstallPermission(bp) !=
+                        PermissionsState.PERMISSION_OPERATION_FAILURE) {
+                    scheduleWriteSettingsLocked();
+                }
+                return;
+            }
+
+            if (permissionsState.revokeRuntimePermission(bp, userId) ==
+                    PermissionsState.PERMISSION_OPERATION_FAILURE) {
+                return;
+            }
+
+            mOnPermissionChangeListeners.onPermissionsChanged(pkg.applicationInfo.uid);
+
+            // Critical, after this call app should never have the permission.
+            mSettings.writeRuntimePermissionsForUserLPr(userId, true);
+
             appId = UserHandle.getAppId(pkg.applicationInfo.uid);
         }
 
@@ -5807,7 +5885,7 @@ public class PackageManagerService extends IPackageManager.Stub
 
                                 try {
                                     revokeRuntimePermission(packageName, permissionName, userId,
-                                           false, mSettings.getPermission(permissionName));
+                                           mSettings.getPermission(permissionName));
                                 } catch (IllegalArgumentException e) {
                                     Slog.e(TAG, "Could not revoke " + permissionName + " from "
                                             + packageName, e);
@@ -12872,7 +12950,7 @@ public class PackageManagerService extends IPackageManager.Stub
         AsyncTask.execute(() -> {
             final int numRemovedPermissions = bps.size();
             for (int permissionNum = 0; permissionNum < numRemovedPermissions; permissionNum++) {
-                final int[] userIds = mUserManagerInternal.getUserIds();
+                final int[] userIds = sUserManager.getUserIds();
                 final int numUserIds = userIds.length;
 
                 final int numPackages = allPackageNames.size();
@@ -12881,7 +12959,7 @@ public class PackageManagerService extends IPackageManager.Stub
                     final PackageManagerInternal packageManagerInt =
                             LocalServices.getService(PackageManagerInternal.class);
                     final ApplicationInfo applicationInfo = packageManagerInt.getApplicationInfo(
-                            packageName, 0, Process.SYSTEM_UID, UserHandle.USER_SYSTEM);
+                            packageName, UserHandle.USER_SYSTEM);
                     if (applicationInfo != null
                             && applicationInfo.targetSdkVersion < Build.VERSION_CODES.M) {
                         continue;
@@ -12895,7 +12973,6 @@ public class PackageManagerService extends IPackageManager.Stub
                                 revokeRuntimePermission(packageName,
                                         permissionName,
                                         userId,
-                                        false,
                                         bps.get(permissionNum));
                             } catch (IllegalArgumentException e) {
                                 Slog.e(TAG, "Could not revoke " + permissionName + " from "

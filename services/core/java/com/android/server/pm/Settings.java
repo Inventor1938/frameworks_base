@@ -464,12 +464,24 @@ public final class Settings {
         return mPackages.get(pkgName);
     }
 
-    String getRenamedPackageLPr(String pkgName) {
-        return mRenamedPackages.get(pkgName);
+    public BasePermission getPermission(@NonNull String permName) {
+        synchronized (mLock) {
+            return getPermissionLocked(permName);
+        }
     }
 
-    String addRenamedPackageLPw(String pkgName, String origPkgName) {
-        return mRenamedPackages.put(pkgName, origPkgName);
+    @GuardedBy("mLock")
+    BasePermission getPermissionLocked(@NonNull String permName) {
+        return mPermissions.get(permName);
+    }
+
+    void setInstallStatus(String pkgName, final int status) {
+        PackageSetting p = mPackages.get(pkgName);
+        if(p != null) {
+            if(p.getInstallStatus() != status) {
+                p.setInstallStatus(status);
+            }
+        }
     }
 
     void applyPendingPermissionGrantsLPw(String packageName, int userId) {
