@@ -211,10 +211,6 @@ final class ActivityManagerConstants extends ContentObserver {
     // Indicates if the processes need to be started asynchronously.
     public boolean FLAG_PROCESS_START_ASYNC = DEFAULT_PROCESS_START_ASYNC;
 
-    // Allow app just moving from TOP to FOREGROUND_SERVICE to stay in a higher adj value for
-    // this long.
-    public long TOP_TO_FGS_GRACE_DURATION = DEFAULT_TOP_TO_FGS_GRACE_DURATION;
-
     // Indicates whether the activity starts logging is enabled.
     // Controlled by Settings.Global.ACTIVITY_STARTS_LOGGING_ENABLED
     boolean mFlagActivityStartsLoggingEnabled;
