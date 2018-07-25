@@ -421,7 +421,7 @@ public class SQLiteQueryBuilder {
             db.validateSql(unwrappedSql, cancellationSignal); // will throw if query is invalid
 
             // Execute wrapped query for extra protection
-            final String wrappedSql = buildQuery(projectionIn, "(" + selection + ")", groupBy,
+            final String wrappedSql = buildQuery(projectionIn, wrap(selection), groupBy,
                     having, sortOrder, limit);
             sql = wrappedSql;
         } else {
@@ -429,6 +429,7 @@ public class SQLiteQueryBuilder {
             sql = unwrappedSql;
         }
 
+        final String[] sqlArgs = selectionArgs;
         if (Log.isLoggable(TAG, Log.DEBUG)) {
             if (Build.IS_DEBUGGABLE) {
                 Log.d(TAG, sql + " with args " + Arrays.toString(sqlArgs));
@@ -455,6 +456,7 @@ public class SQLiteQueryBuilder {
      *   that they appear in the selection. The values will be bound
      *   as Strings.
      * @return the number of rows updated
+     * @hide
      */
     public int update(@NonNull SQLiteDatabase db, @NonNull ContentValues values,
             @Nullable String selection, @Nullable String[] selectionArgs) {
@@ -492,12 +494,12 @@ public class SQLiteQueryBuilder {
         if (selectionArgs == null) {
             selectionArgs = EmptyArray.STRING;
         }
-        final ArrayMap<String, Object> rawValues = values.getValues();
-        final int valuesLength = rawValues.size();
+        final String[] rawKeys = values.keySet().toArray(EmptyArray.STRING);
+        final int valuesLength = rawKeys.length;
         final Object[] sqlArgs = new Object[valuesLength + selectionArgs.length];
         for (int i = 0; i < sqlArgs.length; i++) {
             if (i < valuesLength) {
-                sqlArgs[i] = rawValues.valueAt(i);
+                sqlArgs[i] = values.get(rawKeys[i]);
             } else {
                 sqlArgs[i] = selectionArgs[i - valuesLength];
             }
@@ -525,6 +527,7 @@ public class SQLiteQueryBuilder {
      *   that they appear in the selection. The values will be bound
      *   as Strings.
      * @return the number of rows deleted
+     * @hide
      */
     public int delete(@NonNull SQLiteDatabase db, @Nullable String selection,
             @Nullable String[] selectionArgs) {
@@ -623,7 +626,7 @@ public class SQLiteQueryBuilder {
 
     /** {@hide} */
     public String buildUpdate(ContentValues values, String selection) {
-        if (values == null || values.isEmpty()) {
+        if (values == null || values.size() == 0) {
             throw new IllegalArgumentException("Empty values");
         }
 
@@ -632,12 +635,12 @@ public class SQLiteQueryBuilder {
         sql.append(mTables);
         sql.append(" SET ");
 
-        final ArrayMap<String, Object> rawValues = values.getValues();
-        for (int i = 0; i < rawValues.size(); i++) {
+        final String[] rawKeys = values.keySet().toArray(EmptyArray.STRING);
+        for (int i = 0; i < rawKeys.length; i++) {
             if (i > 0) {
                 sql.append(',');
             }
-            sql.append(rawValues.keyAt(i));
+            sql.append(rawKeys[i]);
             sql.append("=?");
         }
 
