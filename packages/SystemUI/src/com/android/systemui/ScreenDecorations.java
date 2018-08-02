@@ -100,6 +100,7 @@ public class ScreenDecorations extends SystemUI implements Tunable {
     private DisplayCutoutView mCutoutTop;
     private DisplayCutoutView mCutoutBottom;
     private boolean mPendingRotationChange;
+    private Handler mHandler;
 
     @Override
     public void start() {
@@ -136,8 +137,8 @@ public class ScreenDecorations extends SystemUI implements Tunable {
 
             @Override
             public void onDisplayChanged(int displayId) {
-                if (mOverlay != null && mBottomOverlay != null
-                        && mRotation != RotationUtils.getExactRotation(mContext)) {
+                final int newRotation = RotationUtils.getExactRotation(mContext);
+                if (mOverlay != null && mBottomOverlay != null && mRotation != newRotation) {
                     // We cannot immediately update the orientation. Otherwise
                     // WindowManager is still deferring layout until it has finished dispatching
                     // the config changes, which may cause divergence between what we draw
@@ -146,11 +147,15 @@ public class ScreenDecorations extends SystemUI implements Tunable {
                     // - we are trying to redraw. This because WM resized our window and told us to.
                     // - the config change has been dispatched, so WM is no longer deferring layout.
                     mPendingRotationChange = true;
-                    mOverlay.getViewTreeObserver().addOnPreDrawListener(
-                            new RestartingPreDrawListener(mOverlay));
-                    mBottomOverlay.getViewTreeObserver().addOnPreDrawListener(
-                            new RestartingPreDrawListener(mBottomOverlay));
+                    if (DEBUG) {
+                        Log.i(TAG, "Rotation changed, deferring " + newRotation + ", staying at "
+                                + mRotation);
+                    }
 
+                    mOverlay.getViewTreeObserver().addOnPreDrawListener(
+                            new RestartingPreDrawListener(mOverlay, newRotation));
+                    mBottomOverlay.getViewTreeObserver().addOnPreDrawListener(
+                            new RestartingPreDrawListener(mBottomOverlay, newRotation));
                 }
                 updateOrientation();
             }
@@ -235,14 +240,28 @@ public class ScreenDecorations extends SystemUI implements Tunable {
 
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
-        mPendingRotationChange = false;
-        updateOrientation();
-        if (shouldDrawCutout() && mOverlay == null) {
-            setupDecorations();
-        }
+        mHandler.post(() -> {
+            int oldRotation = mRotation;
+            mPendingRotationChange = false;
+            updateOrientation();
+            if (DEBUG) Log.i(TAG, "onConfigChanged from rot " + oldRotation + " to " + mRotation);
+            if (shouldDrawCutout() && mOverlay == null) {
+                setupDecorations();
+            }
+            if (mOverlay != null) {
+                // Updating the layout params ensures that ViewRootImpl will call relayoutWindow(),
+                // which ensures that the forced seamless rotation will end, even if we updated
+                // the rotation before window manager was ready (and was still waiting for sending
+                // the updated rotation).
+                updateLayoutParams();
+            }
+        });
     }
 
-    protected void updateOrientation() {
+    private void updateOrientation() {
+        Preconditions.checkState(mHandler.getLooper().getThread() == Thread.currentThread(),
+                "must call on " + mHandler.getLooper().getThread()
+                        + ", but was " + Thread.currentThread());
         if (mPendingRotationChange) {
             return;
         }
@@ -747,20 +766,66 @@ public class ScreenDecorations extends SystemUI implements Tunable {
     private class RestartingPreDrawListener implements ViewTreeObserver.OnPreDrawListener {
 
         private final View mView;
+        private final int mTargetRotation;
 
-        private RestartingPreDrawListener(View view) {
+        private RestartingPreDrawListener(View view, int targetRotation) {
+            mView = view;
+            mTargetRotation = targetRotation;
+        }
+
+        @Override
+        public boolean onPreDraw() {
+            mView.getViewTreeObserver().removeOnPreDrawListener(this);
+
+            if (mTargetRotation == mRotation) {
+                if (DEBUG) {
+                    Log.i(TAG, (mView == mOverlay ? "OverlayTop" : "OverlayBottom")
+                            + " already in target rot "
+                            + mTargetRotation + ", allow draw without restarting it");
+                }
+                return true;
+            }
+
+            mPendingRotationChange = false;
+            // This changes the window attributes - we need to restart the traversal for them to
+            // take effect.
+            updateOrientation();
+            if (DEBUG) {
+                Log.i(TAG, (mView == mOverlay ? "OverlayTop" : "OverlayBottom")
+                        + " restarting listener fired, restarting draw for rot " + mRotation);
+            }
+            mView.invalidate();
+            return false;
+        }
+    }
+
+    /**
+     * A pre-draw listener, that validates that the rotation we draw in matches the displays
+     * rotation before continuing the draw.
+     *
+     * This is to prevent a race condition, where we have not received the display changed event
+     * yet, and would thus draw in an old orientation.
+     */
+    private class ValidatingPreDrawListener implements ViewTreeObserver.OnPreDrawListener {
+
+        private final View mView;
+
+        public ValidatingPreDrawListener(View view) {
             mView = view;
         }
 
         @Override
         public boolean onPreDraw() {
-            mPendingRotationChange = false;
-            mView.getViewTreeObserver().removeOnPreDrawListener(this);
-            // This changes the window attributes - we need to restart the traversal for them to
-            // take effect.
-            updateOrientation();
-            mView.invalidate();
-            return false;
+            final int displayRotation = RotationUtils.getExactRotation(mContext);
+            if (displayRotation != mRotation && !mPendingRotationChange) {
+                if (DEBUG) {
+                    Log.i(TAG, "Drawing rot " + mRotation + ", but display is at rot "
+                            + displayRotation + ". Restarting draw");
+                }
+                mView.invalidate();
+                return false;
+            }
+            return true;
         }
     }
 }
