@@ -22268,9 +22268,6 @@ Slog.v(TAG, ":: stepped forward, applying functor at tag " + parser.getName());
 
     //TODO: b/111402650
     private void disableSkuSpecificApps() {
-        if (!mIsUpgrade && !mFirstBoot) {
-            return;
-        }
         String apkList[] = mContext.getResources().getStringArray(
                 R.array.config_disableApksUnlessMatchedSku_apk_list);
         String skuArray[] = mContext.getResources().getStringArray(
@@ -22284,7 +22281,9 @@ Slog.v(TAG, ":: stepped forward, applying functor at tag " + parser.getName());
         }
         for (String packageName : apkList) {
             setSystemAppHiddenUntilInstalled(packageName, true);
-            setSystemAppInstallState(packageName, false, ActivityManager.getCurrentUser());
+            for (UserInfo user : sUserManager.getUsers(false)) {
+                setSystemAppInstallState(packageName, false, user.id);
+            }
         }
     }
 
