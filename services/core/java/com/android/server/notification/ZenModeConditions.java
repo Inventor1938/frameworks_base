@@ -155,7 +155,8 @@ public class ZenModeConditions implements ConditionProviders.Callback {
         if (current != null) {
             current.add(id);
         }
-        if (processSubscriptions && trigger != null && trigger.equals(rule.component)) {
+        if (processSubscriptions && ((trigger != null && trigger.equals(rule.component))
+                || isSystemCondition)) {
             if (DEBUG) Log.d(TAG, "Subscribing to " + rule.component);
             if (mConditionProviders.subscribeIfNecessary(rule.component, rule.conditionId)) {
                 synchronized (mSubscriptions) {
