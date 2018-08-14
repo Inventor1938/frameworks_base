@@ -2323,9 +2323,8 @@ public final class AutofillManager {
             if (sVerbose) {
                 // NOTE: this is waaay spammy, but that's life.
                 Log.v(TAG, "onAccessibilityEvent(" + AccessibilityEvent.eventTypeToString(type)
-                        + "): virtualId="
-                        + AccessibilityNodeInfo.getVirtualDescendantId(event.getSourceNodeId())
-                        + ", client=" + getClient());
+                        + "): "
+                        + AccessibilityNodeInfo.getVirtualDescendantId(event.getSourceNodeId()));
             }
             switch (type) {
                 case AccessibilityEvent.TYPE_VIEW_FOCUSED: {
