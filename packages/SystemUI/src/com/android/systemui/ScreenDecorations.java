@@ -244,6 +244,7 @@ public class ScreenDecorations extends SystemUI implements Tunable {
             int oldRotation = mRotation;
             mPendingRotationChange = false;
             updateOrientation();
+            updateRoundedCornerRadii();
             if (DEBUG) Log.i(TAG, "onConfigChanged from rot " + oldRotation + " to " + mRotation);
             if (shouldDrawCutout() && mOverlay == null) {
                 setupDecorations();
