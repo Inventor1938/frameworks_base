@@ -300,17 +300,6 @@ final class LogicalDisplay {
     }
 
     /**
-     * Return the insets currently applied to the display.
-     *
-     * Note that the base DisplayInfo already takes these insets into account, so if you want to
-     * find out the <b>true</b> size of the display, you need to add them back to the logical
-     * dimensions.
-     */
-    public Rect getInsets() {
-        return getMaskingInsets(mPrimaryDisplayDeviceInfo);
-    }
-
-    /**
      * Returns insets in ROTATION_0 for areas that are masked.
      */
     private static Rect getMaskingInsets(DisplayDeviceInfo deviceInfo) {
