@@ -27049,12 +27049,15 @@ public class ActivityManagerService extends IActivityManager.Stub
 
         @Override
         public void notifyDefaultDisplaySizeChanged() {
-            synchronized (ActivityManagerService.this) {
-                if (mSystemServiceManager.isBootCompleted() && mHomeProcess != null) {
+            synchronized (this) {
+                if (mSystemServiceManager.isBootCompleted()) {
+                    Slog.i(TAG, "Killing processes because of display size change");
+                    killAllBackgroundProcessesExcept(-1, ActivityManager.PROCESS_STATE_SERVICE);
 
                     // TODO: Ugly hack to unblock the release
-                    Slog.i(TAG, "Killing home process because of display size change");
-                    removeProcessLocked(mHomeProcess, false, true, "kill home screen size");
+                    if (mHomeProcess != null) {
+                        removeProcessLocked(mHomeProcess, false, true, "kill home screen size");
+                    }
                 }
             }
         }
