@@ -185,6 +185,7 @@ public class StatusBarMobileView extends FrameLayout implements DarkReceiver,
         }else {
             mVolte.setVisibility(View.GONE);
         }
+
     }
 
     private void updateState(MobileIconState state) {
