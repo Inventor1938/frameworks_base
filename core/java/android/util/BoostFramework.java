@@ -340,6 +340,20 @@ public class BoostFramework {
     }
 
 /** @hide */
+    public int perfGetFeedback(int req, String userDataStr) {
+        int ret = -1;
+        try {
+            if (sFeedbackFunc != null) {
+                Object retVal = sFeedbackFunc.invoke(mPerf, req, userDataStr);
+                ret = (int)retVal;
+            }
+        } catch(Exception e) {
+            Log.e(TAG,"Exception " + e);
+        }
+        return ret;
+    }
+
+/** @hide */
     public int perfIOPrefetchStart(int pid, String pkgName, String codePath) {
         int ret = -1;
         try {
