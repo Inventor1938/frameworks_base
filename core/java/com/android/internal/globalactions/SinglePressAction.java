@@ -77,27 +77,21 @@ public abstract class SinglePressAction implements Action {
 
         TextView statusView = v.findViewById(R.id.status);
         final String status = getStatus();
-        if (statusView != null) {
-            if (!TextUtils.isEmpty(status)) {
-                statusView.setText(status);
-            } else {
-                statusView.setVisibility(View.GONE);
-            }
+        if (!TextUtils.isEmpty(status)) {
+            statusView.setText(status);
+        } else {
+            statusView.setVisibility(View.GONE);
         }
-        if (icon != null) {
-            if (mIcon != null) {
-                icon.setImageDrawable(mIcon);
-                icon.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            } else if (mIconResId != 0) {
-                icon.setImageDrawable(context.getDrawable(mIconResId));
-            }
+        if (mIcon != null) {
+            icon.setImageDrawable(mIcon);
+            icon.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        } else if (mIconResId != 0) {
+            icon.setImageDrawable(context.getDrawable(mIconResId));
         }
-        if (messageView != null) {
-            if (mMessage != null) {
-                messageView.setText(mMessage);
-            } else {
-                messageView.setText(mMessageResId);
-            }
+        if (mMessage != null) {
+            messageView.setText(mMessage);
+        } else {
+            messageView.setText(mMessageResId);
         }
 
         return v;
