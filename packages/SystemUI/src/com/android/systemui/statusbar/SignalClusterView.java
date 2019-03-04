@@ -275,7 +275,7 @@ public class SignalClusterView extends LinearLayout implements NetworkController
     }
 
     private void updateActivityEnabled() {
-        mActivityEnabled = false;
+        mActivityEnabled = mContext.getResources().getBoolean(R.bool.config_showActivity);
         mWifiActivityEnabled = mContext.getResources().getBoolean(R.bool.config_showWifiActivity);
     }
 
