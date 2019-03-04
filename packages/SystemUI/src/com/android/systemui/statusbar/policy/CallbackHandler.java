@@ -126,8 +126,7 @@ public class CallbackHandler extends Handler implements EmergencyListener, Signa
             final int statusType, final int qsType,final boolean activityIn,
             final boolean activityOut, final int volteIcon,
             final String typeContentDescription, final String description, final boolean isWide,
-            final int subId, boolean roaming,
-            boolean fiveGAvailable, int fiveGStrengthId, boolean dataOnFiveG) {
+            final int subId, boolean roaming) {
         post(new Runnable() {
             @Override
             public void run() {
@@ -135,8 +134,7 @@ public class CallbackHandler extends Handler implements EmergencyListener, Signa
                     signalCluster.setMobileDataIndicators(statusIcon, qsIcon, statusType, qsType,
                             activityIn, activityOut, dataActivityId,
                             stackedDataIcon, stackedVoiceIcon, typeContentDescription,
-                            description, isWide, subId, roaming,
-                            fiveGAvailable, fiveGStrengthId, dataOnFiveG);
+                            description, isWide, subId, roaming);
                 }
             }
         });

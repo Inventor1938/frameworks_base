@@ -59,7 +59,6 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
 LOCAL_JAVA_LIBRARIES := telephony-ext \
     telephony-common \
     android.car \
-    qtiNetworkLib \
     ims-common
 
 LOCAL_PACKAGE_NAME := SystemUI

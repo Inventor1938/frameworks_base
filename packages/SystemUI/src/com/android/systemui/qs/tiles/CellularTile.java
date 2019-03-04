@@ -247,8 +247,7 @@ public class CellularTile extends QSTileImpl<SignalState> {
         public void setMobileDataIndicators(IconState statusIcon, IconState qsIcon, int statusType,
                 int qsType, boolean activityIn, boolean activityOut, int volteIcon,
                 String typeContentDescription, String description, boolean isWide,
-                int subId, boolean roaming,
-                boolean fiveGAvailable, int fiveGSignalStrengId, boolean dataOnFiveG) {
+                int subId, boolean roaming) {
             if (qsIcon == null) {
                 // Not data sim, don't display.
                 return;
