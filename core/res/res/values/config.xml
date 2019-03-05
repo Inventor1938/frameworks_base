@@ -3495,4 +3495,8 @@
     <!-- Brand value for attestation of misprovisioned device. -->
     <string name="config_misprovisionedBrandValue" translatable="false"></string>
 
+    <!-- Applications which are disabled unless matching a particular sku -->
+    <string-array name="config_disableApksUnlessMatchedSku_apk_list" translatable="false" />
+    <string-array name="config_disableApkUnlessMatchedSku_skus_list" translatable="false" />
+
 </resources>
