@@ -72,23 +72,12 @@ public abstract class Vibrator {
     public @interface VibrationIntensity{}
 
     private final String mPackageName;
-    // The default vibration intensity level for haptic feedback.
-    @VibrationIntensity
-    private final int mDefaultHapticFeedbackIntensity;
-    // The default vibration intensity level for notifications.
-    @VibrationIntensity
-    private final int mDefaultNotificationVibrationIntensity;
 
     /**
      * @hide to prevent subclassing from outside of the framework
      */
     public Vibrator() {
         mPackageName = ActivityThread.currentPackageName();
-        final Context ctx = ActivityThread.currentActivityThread().getSystemContext();
-        mDefaultHapticFeedbackIntensity = loadDefaultIntensity(ctx,
-                com.android.internal.R.integer.config_defaultHapticFeedbackIntensity);
-        mDefaultNotificationVibrationIntensity = loadDefaultIntensity(ctx,
-                com.android.internal.R.integer.config_defaultNotificationVibrationIntensity);
     }
 
     /**
@@ -96,14 +85,6 @@ public abstract class Vibrator {
      */
     protected Vibrator(Context context) {
         mPackageName = context.getOpPackageName();
-        mDefaultHapticFeedbackIntensity = loadDefaultIntensity(context,
-                com.android.internal.R.integer.config_defaultHapticFeedbackIntensity);
-        mDefaultNotificationVibrationIntensity = loadDefaultIntensity(context,
-                com.android.internal.R.integer.config_defaultNotificationVibrationIntensity);
-    }
-
-    private int loadDefaultIntensity(Context ctx, int resId) {
-        return ctx != null ? ctx.getResources().getInteger(resId) : VIBRATION_INTENSITY_MEDIUM;
     }
 
     /**
@@ -111,7 +92,7 @@ public abstract class Vibrator {
      * @hide
      */
     public int getDefaultHapticFeedbackIntensity() {
-        return mDefaultHapticFeedbackIntensity;
+        return VIBRATION_INTENSITY_MEDIUM;
     }
 
     /**
@@ -119,7 +100,7 @@ public abstract class Vibrator {
      * @hide
      */
     public int getDefaultNotificationVibrationIntensity() {
-        return mDefaultNotificationVibrationIntensity;
+        return VIBRATION_INTENSITY_HIGH;
     }
 
     /**
