@@ -14,8 +14,6 @@
 
 package com.android.systemui;
 
-import static android.view.WindowManager.LayoutParams.PRIVATE_FLAG_HIDE_NON_SYSTEM_OVERLAY_WINDOWS;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.slice.SliceManager;
@@ -63,9 +61,7 @@ public class SlicePermissionActivity extends Activity implements OnClickListener
                     .setNegativeButton(R.string.slice_permission_deny, this)
                     .setPositiveButton(R.string.slice_permission_allow, this)
                     .setOnDismissListener(this)
-                    .create();
-            dialog.getWindow().addPrivateFlags(PRIVATE_FLAG_HIDE_NON_SYSTEM_OVERLAY_WINDOWS);
-            dialog.show();
+                    .show();
             TextView t1 = dialog.getWindow().getDecorView().findViewById(R.id.text1);
             t1.setText(getString(R.string.slice_permission_text_1, app2));
             TextView t2 = dialog.getWindow().getDecorView().findViewById(R.id.text2);
