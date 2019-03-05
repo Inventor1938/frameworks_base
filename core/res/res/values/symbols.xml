@@ -3398,4 +3398,8 @@
   <java-symbol type="string" name="battery_saver_description_with_learn_more" />
   <java-symbol type="bool" name="config_primarycard" />
   <java-symbol type="drawable" name="ic_lock_lockdown" />
+
+  <java-symbol type="string" name="config_misprovisionedDeviceModel" />
+  <java-symbol type="string" name="config_misprovisionedBrandValue" />
+
 </resources>
